@@ -6,6 +6,7 @@ import SignUp from "../pages/Signup";
 import Dashboard from "../pages/Dashboard";
 import ChangePassword from "../pages/Changepassword";
 import VerifyEmail from "../pages/VerifyEmail";
+import { requireAuth, requireGuest } from "./loader";
 
 export const router = createBrowserRouter([
   {
@@ -14,6 +15,7 @@ export const router = createBrowserRouter([
   },
   {
     element: <PublicLayout />,
+    loader: requireGuest,
     children: [
       { path: "/signin", element: <SignIn /> },
       { path: "/signup", element: <SignUp /> },
@@ -21,6 +23,7 @@ export const router = createBrowserRouter([
   },
   {
     element: <PrivateLayout />,
+    loader: requireAuth,
     children: [
       { path: "/dashboard", element: <Dashboard /> },
       { path: "/change-password", element: <ChangePassword /> },

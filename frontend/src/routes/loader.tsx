@@ -1,33 +1,28 @@
 import { redirect } from "react-router";
-import { isAuthenticated} from "../services/auth.service";
-import { store } from "../store/index";
-import { authApi } from "../store/api/authApi";
+import { useAuth } from "../store/hooks";
+
 export function requireAuth() {
-  if (!isAuthenticated()) {
+  const { isAuthenticated } = useAuth();
+  if (!isAuthenticated) {
     throw redirect("/signin");
   }
   return null;
 }
 
 export function requireGuest() {
-  if (isAuthenticated()) {
+  const { isAuthenticated } = useAuth();
+  if (isAuthenticated) {
     throw redirect("/dashboard");
   }
   return null;
 }
 
-
-
-
 export async function userLoader() {
-
-  const result = await store.dispatch(
-    authApi.endpoints.getMe.initiate(undefined)
-  );
-
-  if ("error" in result) {
+  const { user, isAuthenticated } = useAuth();
+  
+  if (!isAuthenticated || !user) {
     throw redirect("/signin");
   }
-
-  return result.data;
+  
+  return { user };
 }
