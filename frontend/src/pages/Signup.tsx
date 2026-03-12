@@ -29,11 +29,9 @@ export default function SignUp() {
     try {
       clearError();
       await registerUser(data);
-      // Redirect to OTP verify page with email
       navigate("/verify-otp", { state: { email: data.email } });
     } catch (error: any) {
       handleError(error, "Registration", ErrorType.VALIDATION);
-      // Set form error if available
       if (error?.data?.message) {
         setError("root", { message: error.data.message });
       }
@@ -48,7 +46,6 @@ export default function SignUp() {
           Create Account
         </h2>
 
-        {/* Backend Error */}
         {(error || errors.root?.message) && (
           <div className="mb-4 text-sm text-red-600 text-center">
             {error || errors.root?.message}
@@ -57,7 +54,6 @@ export default function SignUp() {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 
-          {/* Role */}
           <div>
             <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">
               Role
@@ -75,7 +71,6 @@ export default function SignUp() {
             )}
           </div>
 
-          {/* Name */}
           <div>
             <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">
               Full Name
@@ -90,7 +85,6 @@ export default function SignUp() {
             )}
           </div>
 
-          {/* Email */}
           <div>
             <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">
               Email
@@ -105,7 +99,6 @@ export default function SignUp() {
             )}
           </div>
 
-          {/* Password */}
           <div>
             <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">
               Password
@@ -122,7 +115,6 @@ export default function SignUp() {
             )}
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={isSubmitting || isLoading}
@@ -132,7 +124,6 @@ export default function SignUp() {
           </button>
         </form>
 
-        {/* Link */}
         <p className="mt-6 text-sm text-center text-gray-600 dark:text-gray-400">
           Already have an account?{" "}
           <Link to="/signin" className="font-medium underline">

@@ -1,4 +1,3 @@
-// RBAC Configuration - Mirrors backend RBAC
 export const Role = {
   USER: "user",
   ADMIN: "admin",
@@ -7,12 +6,10 @@ export const Role = {
 export type Role = typeof Role[keyof typeof Role];
 
 export const Permission = {
-  // User permissions
   READ_OWN_PROFILE: "read_own_profile",
   UPDATE_OWN_PROFILE: "update_own_profile",
   DELETE_OWN_PROFILE: "delete_own_profile",
   
-  // Admin permissions
   READ_ALL_USERS: "read_all_users",
   UPDATE_ANY_USER: "update_any_user",
   DELETE_ANY_USER: "delete_any_user",
@@ -23,7 +20,6 @@ export const Permission = {
 
 export type Permission = typeof Permission[keyof typeof Permission];
 
-// Role-Permission mapping (mirrors backend)
 export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   [Role.USER]: [
     Permission.READ_OWN_PROFILE,
@@ -43,7 +39,6 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   ],
 };
 
-// Helper functions for RBAC
 export const hasPermission = (userRole: Role, permission: Permission): boolean => {
   return ROLE_PERMISSIONS[userRole]?.includes(permission) || false;
 };

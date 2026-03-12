@@ -1,4 +1,3 @@
-// Error types for frontend error handling
 export const ErrorType = {
   NETWORK: "NETWORK",
   VALIDATION: "VALIDATION",
@@ -11,7 +10,6 @@ export const ErrorType = {
 
 export type ErrorType = typeof ErrorType[keyof typeof ErrorType];
 
-// Error severity levels
 export const ErrorSeverity = {
   LOW: "low",
   MEDIUM: "medium",
@@ -30,7 +28,6 @@ export interface AppError {
   context?: string;
 }
 
-// Error categories for better organization
 export interface ErrorCategory {
   type: ErrorType;
   severity: ErrorSeverity;
@@ -39,7 +36,6 @@ export interface ErrorCategory {
   suggestedAction?: string;
 }
 
-// Error category mapping
 export const ERROR_CATEGORIES: Record<ErrorType, ErrorCategory> = {
   [ErrorType.NETWORK]: {
     type: ErrorType.NETWORK,

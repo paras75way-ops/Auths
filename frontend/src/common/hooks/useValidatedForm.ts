@@ -4,7 +4,6 @@ import { z } from "zod";
 import { useState } from "react";
 import { useErrorHandler, ErrorType } from "../errors";
 
-// Custom hook for form validation with Zod
 export const useValidatedForm = <T extends z.ZodType<any, any, any>>(
   schema: T,
   options?: {
@@ -45,7 +44,6 @@ export const useValidatedForm = <T extends z.ZodType<any, any, any>>(
     try {
       await form.handleSubmit(onSubmit)();
     } catch (error) {
-      // Handle error with the error handler
       handleError(error, "Form Submission", ErrorType.VALIDATION);
       setServerErrorFromResponse(error);
     } finally {
@@ -53,7 +51,6 @@ export const useValidatedForm = <T extends z.ZodType<any, any, any>>(
     }
   };
 
-  // Create a synchronous submit handler for the form
   const createSubmitHandler = (onSubmit: (data: any) => Promise<void>) => {
     return (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
@@ -73,7 +70,6 @@ export const useValidatedForm = <T extends z.ZodType<any, any, any>>(
   };
 };
 
-// Utility function to validate form data manually
 export const validateFormData = <T extends z.ZodType<any, any, any>>(
   schema: T,
   data: unknown

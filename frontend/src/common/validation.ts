@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-// Base user schema (matches backend IUser interface)
 export const userSchema = z.object({
   id: z.string(),
   name: z.string().min(1, "Name is required"),
@@ -9,7 +8,6 @@ export const userSchema = z.object({
   isVerified: z.boolean(),
 });
 
-// Registration schema (matches backend auth validation)
 export const registerSchema = z.object({
   name: z.string()
     .min(2, "Name must be at least 2 characters")
@@ -33,7 +31,6 @@ export const registerSchema = z.object({
   }),
 });
 
-// Login schema (matches backend auth validation)
 export const loginSchema = z.object({
   email: z.string()
     .email("Invalid email format")
@@ -43,7 +40,6 @@ export const loginSchema = z.object({
     .min(1, "Password is required"),
 });
 
-// OTP verification schema (matches backend auth validation)
 export const verifyOtpSchema = z.object({
   email: z.string()
     .email("Invalid email format"),
@@ -53,13 +49,11 @@ export const verifyOtpSchema = z.object({
     .regex(/^\d+$/, "OTP must contain only numbers"),
 });
 
-// Resend OTP schema (matches backend auth validation)
 export const resendOtpSchema = z.object({
   email: z.string()
     .email("Invalid email format"),
 });
 
-// Change password schema (matches backend auth validation)
 export const changePasswordSchema = z.object({
   currentPassword: z.string()
     .min(1, "Current password is required"),
@@ -72,7 +66,6 @@ export const changePasswordSchema = z.object({
     .regex(/\d/, "New password must contain at least one number"),
 });
 
-// Profile update schema (matches backend user validation)
 export const updateProfileSchema = z.object({
   name: z.string()
     .min(2, "Name must be at least 2 characters")
@@ -86,7 +79,6 @@ export const updateProfileSchema = z.object({
     .optional(),
 });
 
-// Admin user update schema (matches backend admin validation)
 export const adminUpdateUserSchema = z.object({
   name: z.string()
     .min(2, "Name must be at least 2 characters")
@@ -107,14 +99,12 @@ export const adminUpdateUserSchema = z.object({
   isVerified: z.boolean().optional(),
 });
 
-// Role management schema (matches backend admin validation)
 export const manageRoleSchema = z.object({
   newRole: z.enum(["user", "admin"], {
     errorMap: () => ({ message: "Role must be either 'user' or 'admin'" })
   }),
 });
 
-// Type exports for use in forms
 export type RegisterFormData = z.infer<typeof registerSchema>;
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type VerifyOtpFormData = z.infer<typeof verifyOtpSchema>;
