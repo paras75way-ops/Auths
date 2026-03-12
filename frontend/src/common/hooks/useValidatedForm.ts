@@ -53,6 +53,14 @@ export const useValidatedForm = <T extends z.ZodType<any, any, any>>(
     }
   };
 
+  // Create a synchronous submit handler for the form
+  const createSubmitHandler = (onSubmit: (data: any) => Promise<void>) => {
+    return (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      handleSubmitWithLoading(onSubmit);
+    };
+  };
+
   return {
     ...form,
     serverError,
@@ -61,6 +69,7 @@ export const useValidatedForm = <T extends z.ZodType<any, any, any>>(
     setServerErrorFromResponse,
     isSubmitting,
     handleSubmitWithLoading,
+    createSubmitHandler,
   };
 };
 

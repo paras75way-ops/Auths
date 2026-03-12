@@ -1,27 +1,22 @@
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router";
 import { useAuth } from "../store/hooks";
-import { useValidatedForm } from "../common/hooks/useValidatedForm";
 import { loginSchema, type LoginFormData } from "../common/validation";
-
-interface ISignInForm {
-  email: string;
-  password: string;
-}
+import { useErrorHandler, ErrorType } from "../common/errors";
 
 export default function SignIn() {
   const navigate = useNavigate();
   const { login, isLoading, error, clearError } = useAuth();
+  const { handleError } = useErrorHandler();
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
-    serverError,
-    setServerError,
-    clearServerError,
-    isSubmitting,
-    handleSubmitWithLoading,
-  } = useValidatedForm(loginSchema, {
+    formState: { errors, isSubmitting },
+    setError,
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -31,18 +26,21 @@ export default function SignIn() {
   const onSubmit = async (data: LoginFormData) => {
     try {
       clearError();
-      setServerError(null);
       await login(data);
       navigate("/dashboard"); // Redirect on successful login
     } catch (error: any) {
-      setServerError(error.data?.message || error.message || "Login failed");
+      handleError(error, "Login", ErrorType.AUTHENTICATION);
+      // Set form error if available
+      if (error?.data?.message) {
+        setError("root", { message: error.data.message });
+      }
     }
   };
 
   return (
     <div className="flex items-center justify-center min-h-[70vh]">
       <form
-        onSubmit={handleSubmitWithLoading(onSubmit)}
+        onSubmit={handleSubmit(onSubmit)}
         className="w-full max-w-md space-y-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8 shadow-sm"
       >
         <h2 className="text-2xl font-semibold text-center">
@@ -50,9 +48,9 @@ export default function SignIn() {
         </h2>
 
         {/* Backend Error */}
-        {(serverError || error) && (
+        {(error || errors.root?.message) && (
           <div className="text-sm text-red-600 text-center">
-            {serverError || error}
+            {error || errors.root?.message}
           </div>
         )}
 
@@ -66,7 +64,7 @@ export default function SignIn() {
           />
           {errors.email && (
             <p className="text-sm text-red-500 mt-1">
-              {errors.email.message}
+              {errors.email.message as string}
             </p>
           )}
         </div>
@@ -81,7 +79,7 @@ export default function SignIn() {
           />
           {errors.password && (
             <p className="text-sm text-red-500 mt-1">
-              {errors.password.message}
+              {errors.password.message as string}
             </p>
           )}
         </div>

@@ -1,20 +1,20 @@
-import { useValidatedForm } from "../common/hooks/useValidatedForm";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "../store/hooks";
 import { changePasswordSchema, type ChangePasswordFormData } from "../common/validation";
+import { useErrorHandler, ErrorType } from "../common/errors";
 
 export default function ChangePassword() {
   const { changePassword, isLoading, error, clearError } = useAuth();
-  
+  const { handleError } = useErrorHandler();
+
   const {
     register,
     handleSubmit,
-    formState: { errors },
-    serverError,
-    setServerError,
-    clearServerError,
-    isSubmitting,
-    handleSubmitWithLoading,
-  } = useValidatedForm(changePasswordSchema, {
+    formState: { errors, isSubmitting },
+    setError,
+  } = useForm<ChangePasswordFormData>({
+    resolver: zodResolver(changePasswordSchema),
     defaultValues: {
       currentPassword: "",
       newPassword: "",
@@ -22,18 +22,24 @@ export default function ChangePassword() {
   });
 
   const onSubmit = async (data: ChangePasswordFormData) => {
-    clearError();
-    setServerError(null);
-
     try {
+      clearError();
       await changePassword(data);
-      setServerError("Password changed successfully!");
-      // Reset form after successful change
-      // Note: You might want to add a reset function to the hook
+      // Show success message
+      setError("root", { 
+        type: "custom",
+        message: "Password changed successfully!" 
+      });
     } catch (error: any) {
-      setServerError(error.data?.message || error.message || "Something went wrong");
+      handleError(error, "Change Password", ErrorType.VALIDATION);
+      // Set form error if available
+      if (error?.data?.message) {
+        setError("root", { message: error.data.message });
+      }
     }
   };
+
+  const hasSuccessMessage = errors.root?.type === "custom" && errors.root?.message?.includes("successfully");
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-950 px-4">
@@ -43,7 +49,7 @@ export default function ChangePassword() {
           Change Password
         </h2>
 
-        <form onSubmit={handleSubmitWithLoading(onSubmit)} className="space-y-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           
           {/* Current Password */}
           <div>
@@ -58,7 +64,7 @@ export default function ChangePassword() {
             />
             {errors.currentPassword && (
               <p className="text-red-500 text-xs mt-1">
-                {errors.currentPassword.message}
+                {errors.currentPassword.message as string}
               </p>
             )}
           </div>
@@ -76,7 +82,7 @@ export default function ChangePassword() {
             />
             {errors.newPassword && (
               <p className="text-red-500 text-xs mt-1">
-                {errors.newPassword.message}
+                {errors.newPassword.message as string}
               </p>
             )}
           </div>
@@ -91,19 +97,12 @@ export default function ChangePassword() {
           </button>
         </form>
 
-        {/* Success Message */}
-        {serverError && (
+        {/* Success/Error Message */}
+        {(error || errors.root?.message) && (
           <p className={`mt-4 text-sm text-center ${
-            serverError.includes("successfully") ? "text-green-400" : "text-red-400"
+            hasSuccessMessage ? "text-green-400" : "text-red-400"
           }`}>
-            {serverError}
-          </p>
-        )}
-
-        {/* Error Message */}
-        {error && (
-          <p className="mt-4 text-sm text-red-400 text-center">
-            {error}
+            {error || errors.root?.message}
           </p>
         )}
       </div>

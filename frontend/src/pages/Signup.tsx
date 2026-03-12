@@ -1,22 +1,22 @@
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, Link } from "react-router";
 import { useAuth } from "../store/hooks";
-import { useValidatedForm } from "../common/hooks/useValidatedForm";
 import { registerSchema, type RegisterFormData } from "../common/validation";
+import { useErrorHandler, ErrorType } from "../common/errors";
 
 export default function SignUp() {
   const navigate = useNavigate();
   const { register: registerUser, isLoading, error, clearError } = useAuth();
+  const { handleError } = useErrorHandler();
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
-    serverError,
-    setServerError,
-    clearServerError,
-    isSubmitting,
-    handleSubmitWithLoading,
-  } = useValidatedForm(registerSchema, {
+    formState: { errors, isSubmitting },
+    setError,
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -28,15 +28,15 @@ export default function SignUp() {
   const onSubmit = async (data: RegisterFormData) => {
     try {
       clearError();
-      setServerError(null);
-
       await registerUser(data);
-
       // Redirect to OTP verify page with email
       navigate("/verify-otp", { state: { email: data.email } });
-
     } catch (error: any) {
-      setServerError(error.data?.message || error.message || "Signup failed");
+      handleError(error, "Registration", ErrorType.VALIDATION);
+      // Set form error if available
+      if (error?.data?.message) {
+        setError("root", { message: error.data.message });
+      }
     }
   };
 
@@ -48,13 +48,14 @@ export default function SignUp() {
           Create Account
         </h2>
 
-        {(serverError || error) && (
+        {/* Backend Error */}
+        {(error || errors.root?.message) && (
           <div className="mb-4 text-sm text-red-600 text-center">
-            {serverError || error}
+            {error || errors.root?.message}
           </div>
         )}
 
-        <form onSubmit={handleSubmitWithLoading(onSubmit)} className="space-y-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 
           {/* Role */}
           <div>
@@ -70,7 +71,7 @@ export default function SignUp() {
             </select>
 
             {errors.role && (
-              <p className="text-red-500 text-xs mt-1">{errors.role.message}</p>
+              <p className="text-red-500 text-xs mt-1">{errors.role.message as string}</p>
             )}
           </div>
 
@@ -85,7 +86,7 @@ export default function SignUp() {
               className="w-full p-2.5 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
             />
             {errors.name && (
-              <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
+              <p className="text-red-500 text-xs mt-1">{errors.name.message as string}</p>
             )}
           </div>
 
@@ -100,7 +101,7 @@ export default function SignUp() {
               className="w-full p-2.5 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
             />
             {errors.email && (
-              <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+              <p className="text-red-500 text-xs mt-1">{errors.email.message as string}</p>
             )}
           </div>
 
@@ -116,7 +117,7 @@ export default function SignUp() {
             />
             {errors.password && (
               <p className="text-red-500 text-xs mt-1">
-                {errors.password.message}
+                {errors.password.message as string}
               </p>
             )}
           </div>

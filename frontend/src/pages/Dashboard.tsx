@@ -1,12 +1,10 @@
 import { useAuth } from "../store/hooks";
 import { UserProfile } from "../components/AuthComponents";
 import { AdminDashboard, UserManagement, AdminProfile } from "../components/AdminComponents";
-import { AdminOnly, UserOnly } from "../common/components/RBACGuards";
-import { useIsAdmin } from "../common/hooks/useRBAC";
+import { AdminOnly } from "../common/components/RBACGuards";
 
 export default function Dashboard() {
   const { user, isAuthenticated, isLoading } = useAuth();
-  const isAdmin = useIsAdmin();
 
   if (isLoading) {
     return (
